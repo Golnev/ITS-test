@@ -1,5 +1,6 @@
 import logging
 import os
+from email.policy import default
 
 import pytest
 from dotenv import load_dotenv
@@ -13,6 +14,10 @@ def pytest_configure():
     logging.getLogger('faker').setLevel(logging.WARNING)
     logging.getLogger('requests').setLevel(logging.WARNING)
     logging.getLogger('urllib3').setLevel(logging.WARNING)
+
+
+def pytest_addoption(parser):
+    parser.addoption('--rm', action='store_true', default=False, help='Delete a created contact after a test')
 
 
 @pytest.fixture(scope='module')

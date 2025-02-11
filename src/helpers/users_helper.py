@@ -22,11 +22,9 @@ class UsersHelper:
                      f'fake user last name: {payload['lastName']}, '
                      f'fake user email: {payload['email']}')
 
-        headers = auth_headers
-
         create_user_json = self.request_utility.post(endpoint='users',
                                                      payload=payload,
-                                                     headers=headers,
+                                                     headers=auth_headers,
                                                      expected_status_code=201)
 
         return create_user_json, payload
@@ -34,20 +32,16 @@ class UsersHelper:
     def delete_user(self, auth_headers: dict):
         logger.debug('Delete user.')
 
-        headers = auth_headers
-
         rs_del_user = self.request_utility.delete(endpoint='users/me',
-                                                  headers=headers)
+                                                  headers=auth_headers)
 
         return rs_del_user
 
     def get_user(self, auth_headers: dict):
         logger.debug('Get user.')
 
-        headers = auth_headers
-
         rs_user_info = self.request_utility.get(endpoint='users/me',
-                                                headers=headers)
+                                                headers=auth_headers)
 
         return rs_user_info
 
@@ -65,10 +59,8 @@ class UsersHelper:
                      f'fake user update last name: {payload['lastName']}, '
                      f'fake user update email: {payload['email']}')
 
-        headers = auth_headers
-
         create_user_json = self.request_utility.patch(endpoint='users/me',
                                                       payload=payload,
-                                                      headers=headers)
+                                                      headers=auth_headers)
 
         return create_user_json, payload
