@@ -10,53 +10,65 @@ class ContactsHelper:
         self.request_utility = RequestUtilities()
 
     def create_contact(self, auth_headers: dict):
-        logger.debug('Create new contact.')
+        logger.debug("Create new contact.")
         fake = Faker()
 
         payload = dict()
-        payload['firstName'] = fake.first_name()
-        payload['lastName'] = fake.last_name()
-        payload['birthdate'] = (fake.date_of_birth(minimum_age=6, maximum_age=110)).strftime('%Y-%m-%d')
-        payload['email'] = fake.email()
-        payload['phone'] = fake.basic_phone_number()
-        payload['street1'] = fake.street_name()
-        payload['street2'] = fake.street_name()
-        payload['city'] = fake.city()
-        payload['stateProvince'] = fake.state()
-        payload['postalCode'] = fake.postalcode()
-        payload['country'] = fake.country()
+        payload["firstName"] = fake.first_name()
+        payload["lastName"] = fake.last_name()
+        payload["birthdate"] = (
+            fake.date_of_birth(minimum_age=6, maximum_age=110)
+        ).strftime("%Y-%m-%d")
+        payload["email"] = fake.email()
+        payload["phone"] = fake.basic_phone_number()
+        payload["street1"] = fake.street_name()
+        payload["street2"] = fake.street_name()
+        payload["city"] = fake.city()
+        payload["stateProvince"] = fake.state()
+        payload["postalCode"] = fake.postalcode()
+        payload["country"] = fake.country()
 
-        logger.debug('Fake contact created')
+        logger.debug("Fake contact created")
 
-        create_contact_json = self.request_utility.post(endpoint='contacts',
-                                                        payload=payload,
-                                                        headers=auth_headers,
-                                                        expected_status_code=201)
+        create_contact_json = self.request_utility.post(
+            endpoint="contacts",
+            payload=payload,
+            headers=auth_headers,
+            expected_status_code=201,
+        )
 
         return create_contact_json, payload
 
     def delete_contact(self, auth_headers: dict, contact_id: str):
-        logger.debug(f'Delete contact id={contact_id}')
+        logger.debug(f"Delete contact id={contact_id}")
 
-        rs_del_contact = self.request_utility.delete(endpoint=f'contacts/{contact_id}',
-                                                     headers=auth_headers)
+        rs_del_contact = self.request_utility.delete(
+            endpoint=f"contacts/{contact_id}", headers=auth_headers
+        )
 
         return rs_del_contact
 
-    def get_contacts(self, auth_headers: dict,
-                     contact_id: str | None = None,
-                     expected_status_code: int | None = 200):
+    def get_contacts(
+        self,
+        auth_headers: dict,
+        contact_id: str | None = None,
+        expected_status_code: int = 200,
+    ):
         if contact_id is None:
-            logger.debug('Get contacts')
+            logger.debug("Get contacts")
 
-            rs_get_contacts = self.request_utility.get(endpoint='contacts',
-                                                       headers=auth_headers,
-                                                       expected_status_code=expected_status_code)
+            rs_get_contacts = self.request_utility.get(
+                endpoint="contacts",
+                headers=auth_headers,
+                expected_status_code=expected_status_code,
+            )
             return rs_get_contacts
         else:
-            logger.debug(f'Get contact by id={contact_id}')
+            logger.debug(f"Get contact by id={contact_id}")
 
-            rs_get_contact = self.request_utility.get(endpoint=f'contacts/{contact_id}',
-                                                      headers=auth_headers,
-                                                      expected_status_code=expected_status_code)
+            rs_get_contact = self.request_utility.get(
+                endpoint=f"contacts/{contact_id}",
+                headers=auth_headers,
+                expected_status_code=expected_status_code,
+            )
             return rs_get_contact

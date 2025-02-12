@@ -53,7 +53,7 @@ class RequestUtilities:
 
         if self.response_api.headers.get("Content-Length") == self.EMPTY_CONTENT_LENGTH:
             logger.debug("Response has empty body (Content-Length: 0)")
-            return self.response_api
+            return None
 
         self.response_json = self.response_api.json()
 
@@ -62,11 +62,11 @@ class RequestUtilities:
         return self.response_json
 
     def post(
-            self,
-            endpoint: str,
-            payload: dict | None = None,
-            headers: dict | None = None,
-            expected_status_code=200,
+        self,
+        endpoint: str,
+        payload: dict | None = None,
+        headers: dict | None = None,
+        expected_status_code=200,
     ):
         logger.debug("Starting POST method.")
 
@@ -92,10 +92,10 @@ class RequestUtilities:
 
         if self.response_api.headers.get("Content-Length") == self.EMPTY_CONTENT_LENGTH:
             logger.debug("Response has empty body (Content-Length: 0)")
-            return self.response_api
+            return None
 
         if payload is None:
-            return self.response_api
+            return None
 
         self.response_json = self.response_api.json()
 
@@ -104,11 +104,11 @@ class RequestUtilities:
         return self.response_json
 
     def patch(
-            self,
-            endpoint: str,
-            payload: dict | None = None,
-            headers: dict | None = None,
-            expected_status_code=200,
+        self,
+        endpoint: str,
+        payload: dict | None = None,
+        headers: dict | None = None,
+        expected_status_code=200,
     ):
         logger.debug("Starting PATCH method.")
 
@@ -134,10 +134,10 @@ class RequestUtilities:
 
         if self.response_api.headers.get("Content-Length") == self.EMPTY_CONTENT_LENGTH:
             logger.debug("Response has empty body (Content-Length: 0)")
-            return self.response_api
+            return None
 
         if payload is None:
-            return self.response_api
+            return None
 
         self.response_json = self.response_api.json()
 
@@ -146,7 +146,7 @@ class RequestUtilities:
         return self.response_json
 
     def delete(
-            self, endpoint: str, headers: dict | None = None, expected_status_code=200
+        self, endpoint: str, headers: dict | None = None, expected_status_code=200
     ):
         logger.debug("Starting DELETE method.")
 
@@ -165,4 +165,4 @@ class RequestUtilities:
         self.status_code = self.response_api.status_code
         self.__assert_status_code()
 
-        return self.response_api
+        return None
