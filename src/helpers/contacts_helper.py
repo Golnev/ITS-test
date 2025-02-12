@@ -36,7 +36,7 @@ class ContactsHelper:
         return create_contact_json, payload
 
     def delete_contact(self, auth_headers: dict, contact_id: str):
-        logger.debug('Delete contact.')
+        logger.debug(f'Delete contact id={contact_id}')
 
         rs_del_user = self.request_utility.delete(endpoint=f'contacts/{contact_id}',
                                                   headers=auth_headers)

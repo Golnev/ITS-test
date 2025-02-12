@@ -1,10 +1,10 @@
 import logging
 import os
-from email.policy import default
 
 import pytest
 from dotenv import load_dotenv
 
+from src.helpers.contacts_helper import ContactsHelper
 from src.requests_utilities import RequestUtilities
 
 load_dotenv()
@@ -38,3 +38,22 @@ def auth_headers():
     logging.debug('Logout.')
     request_utility.post(endpoint='users/logout',
                          headers={'Authorization': f'Bearer {token}'})
+
+
+@pytest.fixture()
+def cleanup_after_test(auth_headers, pytestconfig):
+    contacts_helper = ContactsHelper()
+    created_contacts = []
+
+    def create_contact():
+        contact_rs_api, contact_info = contacts_helper.create_contact(auth_headers=auth_headers)
+        create_contact_id = contact_rs_api['_id']
+        created_contacts.append(create_contact_id)
+        return contact_rs_api, contact_info
+
+    yield create_contact
+
+    if pytestconfig.getoption('--rm'):
+        for contact_id in created_contacts:
+            contacts_helper.delete_contact(auth_headers=auth_headers, contact_id=contact_id)
+            logging.debug(f'Delete contact: {contact_id}')
