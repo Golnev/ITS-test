@@ -103,6 +103,48 @@ class RequestUtilities:
 
         return self.response_json
 
+    def put(
+        self,
+        endpoint: str,
+        payload: dict | None = None,
+        headers: dict | None = None,
+        expected_status_code=200,
+    ):
+        logger.debug("Starting PUT method.")
+
+        if not headers:
+            headers = {"Content-Type": "application/json"}
+        else:
+            headers.update({"Content-Type": "application/json"})
+
+        self.url = self.base_url + endpoint
+        logger.debug(f"URL: {self.url}")
+
+        self.expected_status_code = expected_status_code
+
+        self.response_api = requests.put(
+            url=self.url,
+            json=payload,
+            headers=headers,
+        )
+
+        self.status_code = self.response_api.status_code
+
+        self.__assert_status_code()
+
+        if self.response_api.headers.get("Content-Length") == self.EMPTY_CONTENT_LENGTH:
+            logger.debug("Response has empty body (Content-Length: 0)")
+            return None
+
+        if payload is None:
+            return None
+
+        self.response_json = self.response_api.json()
+
+        logger.debug(f"PUT API response {self.response_json}")
+
+        return self.response_json
+
     def patch(
         self,
         endpoint: str,

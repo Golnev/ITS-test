@@ -8,6 +8,7 @@ from src.requests_utilities import RequestUtilities
 class ContactsHelper:
     def __init__(self):
         self.request_utility = RequestUtilities()
+        self.FULL_CONTACT: int = 11
 
     def create_contact(self, auth_headers: dict):
         logger.debug("Create new contact.")
@@ -72,3 +73,32 @@ class ContactsHelper:
                 expected_status_code=expected_status_code,
             )
             return rs_get_contact
+
+    def update(
+        self,
+        auth_headers: dict,
+        payload: dict,
+        contact_id: str,
+        expected_status_code: int = 200,
+    ):
+        if len(payload) == self.FULL_CONTACT:
+            logger.debug("Update contact with PUT.")
+
+            rs_update_contact = self.request_utility.put(
+                endpoint=f"contacts/{contact_id}",
+                payload=payload,
+                headers=auth_headers,
+                expected_status_code=expected_status_code,
+            )
+            return rs_update_contact
+
+        if len(payload) < self.FULL_CONTACT:
+            logger.debug("Update contact with PATCH.")
+
+            rs_update_contact = self.request_utility.patch(
+                endpoint=f"contacts/{contact_id}",
+                payload=payload,
+                headers=auth_headers,
+                expected_status_code=expected_status_code,
+            )
+            return rs_update_contact

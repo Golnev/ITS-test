@@ -175,33 +175,254 @@ def test_get_not_existing_contact(auth_headers, manage_contacts):
 
 
 @pytest.mark.contacts
-def test_update_contact(auth_headers, manage_contacts):
-    pass
+def test_update_contact(faker: Faker, auth_headers, manage_contacts):
+    logger.info("TEST: Full update contact.")
+
+    contact_rs_api, _ = manage_contacts()
+
+    contact_id = contact_rs_api["_id"]
+
+    payload = dict()
+    payload["firstName"] = contact_rs_api["firstName"]
+    payload["lastName"] = contact_rs_api["lastName"]
+    payload["birthdate"] = contact_rs_api["birthdate"]
+    payload["email"] = contact_rs_api["email"]
+    #  Change.
+    payload["phone"] = faker.basic_phone_number()
+    payload["street1"] = contact_rs_api["street1"]
+    #  Change.
+    payload["street2"] = faker.street_name()
+    payload["city"] = contact_rs_api["city"]
+    payload["stateProvince"] = contact_rs_api["stateProvince"]
+    #  Change.
+    payload["postalCode"] = faker.postalcode()
+    payload["country"] = contact_rs_api["country"]
+
+    logger.debug(
+        f"Update contact with id={contact_id}, "
+        f"Update phone={payload['phone']}, "
+        f"Update street2={payload['street2']}, "
+        f"Update postalCode={payload['postalCode']}."
+    )
+
+    contacts_helper = ContactsHelper()
+    update_contact = contacts_helper.update(
+        auth_headers=auth_headers, payload=payload, contact_id=contact_id
+    )
+    assert update_contact is not None, "Response is None, but expected JSON response."
+
+    assert contact_id == update_contact["_id"]
+    assert payload["phone"] == update_contact["phone"]
+    assert payload["street2"] == update_contact["street2"]
+    assert payload["postalCode"] == update_contact["postalCode"]
 
 
 @pytest.mark.contacts
 @pytest.mark.negative
-def test_update_not_existing_contact(auth_headers, manage_contacts):
-    pass
+def test_update_not_existing_contact(faker: Faker, auth_headers, manage_contacts):
+    logger.info("TEST: Update not existing contact")
+
+    contact_rs_api, _ = manage_contacts()
+    contact_id = contact_rs_api["_id"]
+
+    contacts_helper = ContactsHelper()
+    contacts_helper.delete_contact(auth_headers=auth_headers, contact_id=contact_id)
+
+    payload = dict()
+    payload["firstName"] = contact_rs_api["firstName"]
+    payload["lastName"] = contact_rs_api["lastName"]
+    payload["birthdate"] = contact_rs_api["birthdate"]
+    payload["email"] = contact_rs_api["email"]
+    #  Change.
+    payload["phone"] = faker.basic_phone_number()
+    payload["street1"] = contact_rs_api["street1"]
+    #  Change.
+    payload["street2"] = faker.street_name()
+    payload["city"] = contact_rs_api["city"]
+    payload["stateProvince"] = contact_rs_api["stateProvince"]
+    #  Change.
+    payload["postalCode"] = faker.postalcode()
+    payload["country"] = contact_rs_api["country"]
+
+    logger.debug(
+        f"Update contact with id={contact_id}, "
+        f"Update phone={payload['phone']}, "
+        f"Update street2={payload['street2']}, "
+        f"Update postalCode={payload['postalCode']}."
+    )
+
+    contacts_helper = ContactsHelper()
+    update_contact = contacts_helper.update(
+        auth_headers=auth_headers,
+        payload=payload,
+        contact_id=contact_id,
+        expected_status_code=404,
+    )
+
+    assert not update_contact, "Request is not empty."
 
 
 @pytest.mark.contacts
 @pytest.mark.negative
 def test_update_contact_with_wrong_data(auth_headers, manage_contacts):
-    pass
+    logger.info("TEST: Update not existing contact")
+
+    contact_rs_api, _ = manage_contacts()
+    contact_id = contact_rs_api["_id"]
+
+    contacts_helper = ContactsHelper()
+    contacts_helper.delete_contact(auth_headers=auth_headers, contact_id=contact_id)
+
+    payload = dict()
+    payload["firstName"] = contact_rs_api["firstName"]
+    payload["lastName"] = contact_rs_api["lastName"]
+    payload["birthdate"] = contact_rs_api["birthdate"]
+    payload["email"] = contact_rs_api["email"]
+    #  Change.
+    payload["phone"] = "No Phone number"
+    payload["street1"] = contact_rs_api["street1"]
+    payload["street2"] = contact_rs_api["street2"]
+    payload["city"] = contact_rs_api["city"]
+    payload["stateProvince"] = contact_rs_api["stateProvince"]
+    #  Change.
+    payload["postalCode"] = "No postal code"
+    payload["country"] = contact_rs_api["country"]
+
+    logger.debug(
+        f"Update contact with id={contact_id}, "
+        f"Update phone={payload['phone']}, "
+        f"Update street2={payload['street2']}, "
+        f"Update postalCode={payload['postalCode']}."
+    )
+
+    contacts_helper = ContactsHelper()
+    update_contact = contacts_helper.update(
+        auth_headers=auth_headers,
+        payload=payload,
+        contact_id=contact_id,
+        expected_status_code=400,
+    )
+
+    assert update_contact is not None, "Response is None, but expected JSON response."
+
+    assert (
+        update_contact["message"] == "Validation failed: "
+        "postalCode: "
+        "Path `postalCode` (`No postal code`) is longer than the maximum allowed length (10)., "
+        "phone: Phone number is invalid"
+    ), "Validation with wrong 'postal code' and 'phone' was successfully"
 
 
 @pytest.mark.contacts
-def test_update_last_name_contact(auth_headers, manage_contacts):
-    pass
+def test_update_last_name_contact(faker: Faker, auth_headers, manage_contacts):
+    logger.info("TEST: Update last name contact")
+
+    contact_rs_api, contact_info = manage_contacts()
+    contact_id = contact_rs_api["_id"]
+
+    update_lastname = faker.last_name()
+    payload = {"lastName": update_lastname}
+
+    contacts_helper = ContactsHelper()
+    update_contact = contacts_helper.update(
+        auth_headers=auth_headers,
+        payload=payload,
+        contact_id=contact_id,
+    )
+    assert update_contact is not None, "Response is None, but expected JSON response."
+
+    assert (
+        update_contact["_id"] == contact_id
+    ), f"Expected contact ID to be {contact_id}, but got {update_contact['_id']}"
+
+    assert (
+        update_contact["lastName"] == update_lastname
+    ), f"Expected last name to be {update_lastname}, but got {update_contact['lastName']}"
 
 
 @pytest.mark.contacts
-def test_update_email_contact(auth_headers, manage_contacts):
-    pass
+def test_update_email_contact(faker: Faker, auth_headers, manage_contacts):
+    logger.info("TEST: Update email contact")
+
+    contact_rs_api, contact_info = manage_contacts()
+    contact_id = contact_rs_api["_id"]
+
+    update_email = faker.email()
+    payload = {"email": update_email}
+
+    contacts_helper = ContactsHelper()
+    update_contact = contacts_helper.update(
+        auth_headers=auth_headers,
+        payload=payload,
+        contact_id=contact_id,
+    )
+    assert update_contact is not None, "Response is None, but expected JSON response."
+
+    assert (
+        update_contact["_id"] == contact_id
+    ), f"Expected contact ID to be {contact_id}, but got {update_contact['_id']}"
+
+    assert (
+        update_contact["email"] == update_email
+    ), f"Expected email to be {update_email}, but got {update_contact['email']}"
+
+
+@pytest.mark.contacts
+def test_upgrade_first_name_and_postal_code_together(
+    faker: Faker, auth_headers, manage_contacts
+):
+    logger.info("TEST: Update first name and postal code contact")
+
+    contact_rs_api, contact_info = manage_contacts()
+    contact_id = contact_rs_api["_id"]
+
+    update_firstname = faker.first_name()
+    update_postal_code = faker.postalcode()
+    payload = {"firstName": update_firstname, "postalCode": update_postal_code}
+
+    contacts_helper = ContactsHelper()
+    update_contact = contacts_helper.update(
+        auth_headers=auth_headers,
+        payload=payload,
+        contact_id=contact_id,
+    )
+    assert update_contact is not None, "Response is None, but expected JSON response."
+
+    assert (
+        update_contact["_id"] == contact_id
+    ), f"Expected contact ID to be {contact_id}, but got {update_contact['_id']}"
+
+    assert (
+        update_contact["firstName"] == update_firstname
+    ), f"Expected email to be {update_firstname}, but got {update_contact["firstName"]}"
+
+    assert (
+        update_contact["postalCode"] == update_postal_code
+    ), f"Expected email to be {update_postal_code}, but got {update_contact['postalCode']}"
 
 
 @pytest.mark.contacts
 @pytest.mark.negative
-def test_update_last_name_contact_with_wrong_data(auth_headers, manage_contacts):
-    pass
+@pytest.mark.parametrize("phone", ["No Phone", 12345678901234567890])
+@pytest.mark.check
+def test_update_phone_with_wrong_data(auth_headers, manage_contacts, phone):
+    logger.info("TEST: Update contact phone number with wrong data.")
+
+    contact_rs_api, contact_info = manage_contacts()
+    contact_id = contact_rs_api["_id"]
+
+    payload = {"phone": phone}
+
+    contacts_helper = ContactsHelper()
+    update_contact = contacts_helper.update(
+        auth_headers=auth_headers,
+        payload=payload,
+        contact_id=contact_id,
+        expected_status_code=400,
+    )
+
+    assert update_contact is not None, "Response is None, but expected JSON response."
+
+    assert (
+        update_contact["_message"] == "Contact validation failed"
+    ), f"Update contact with wrong phone number={phone}"
