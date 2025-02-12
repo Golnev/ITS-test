@@ -11,11 +11,11 @@ def test_add_user(auth_headers):
     users_helper = UsersHelper()
     user_rs_api, _ = users_helper.create_user(auth_headers)
 
-    get_info_user = users_helper.get_user(auth_headers={'Authorization': f'Bearer {user_rs_api['token']}'})
+    get_info_user = users_helper.get_user(auth_headers={'Authorization': f'Bearer {user_rs_api["token"]}'})
 
     assert user_rs_api['user']['_id'] == get_info_user['_id'], 'User Id does not match.'
 
-    users_helper.delete_user(auth_headers={'Authorization': f'Bearer {user_rs_api['token']}'})
+    users_helper.delete_user(auth_headers={'Authorization': f'Bearer {user_rs_api["token"]}'})
 
 
 @pytest.mark.users
@@ -69,7 +69,7 @@ def test_update_user(auth_headers):
 
     update_user_rs_api, update_user_info = users_helper.update_user(
         auth_headers={
-            'Authorization': f'Bearer {user_rs_api['token']}'}
+            'Authorization': f'Bearer {user_rs_api["token"]}'}
     )
 
     assert user_rs_api['user']['_id'] == update_user_rs_api['_id'], (f'User id does not match, '
@@ -84,7 +84,7 @@ def test_update_user(auth_headers):
 
     assert user_info['password'] != update_user_info['password'], 'The password is the same after the update'
 
-    users_helper.delete_user(auth_headers={'Authorization': f'Bearer {user_rs_api['token']}'})
+    users_helper.delete_user(auth_headers={'Authorization': f'Bearer {user_rs_api["token"]}'})
 
 
 @pytest.mark.users
@@ -114,7 +114,7 @@ def test_update_user_without_email_or_password(first_name: str,
 
     rs_api = request_utility.patch(endpoint='users/me',
                                    payload=payload,
-                                   headers={'Authorization': f'Bearer {user_rs_api['token']}'},
+                                   headers={'Authorization': f'Bearer {user_rs_api["token"]}'},
                                    expected_status_code=400)
 
     assert rs_api['_message'] == 'User validation failed', (f'User updated without mandatory data.'
@@ -128,9 +128,9 @@ def test_delete_new_user(auth_headers):
     users_helper = UsersHelper()
     user_rs_api, _ = users_helper.create_user(auth_headers)
 
-    users_helper.get_user(auth_headers={'Authorization': f'Bearer {user_rs_api['token']}'})
+    users_helper.get_user(auth_headers={'Authorization': f'Bearer {user_rs_api["token"]}'})
 
-    rs_del_user = users_helper.delete_user(auth_headers={'Authorization': f'Bearer {user_rs_api['token']}'})
+    rs_del_user = users_helper.delete_user(auth_headers={'Authorization': f'Bearer {user_rs_api["token"]}'})
 
     content_length = rs_del_user.headers.get('Content-Length')
 

@@ -38,7 +38,25 @@ class ContactsHelper:
     def delete_contact(self, auth_headers: dict, contact_id: str):
         logger.debug(f'Delete contact id={contact_id}')
 
-        rs_del_user = self.request_utility.delete(endpoint=f'contacts/{contact_id}',
-                                                  headers=auth_headers)
+        rs_del_contact = self.request_utility.delete(endpoint=f'contacts/{contact_id}',
+                                                     headers=auth_headers)
 
-        return rs_del_user
+        return rs_del_contact
+
+    def get_contacts(self, auth_headers: dict,
+                     contact_id: str | None = None,
+                     expected_status_code: int | None = 200):
+        if contact_id is None:
+            logger.debug('Get contacts')
+
+            rs_get_contacts = self.request_utility.get(endpoint='contacts',
+                                                       headers=auth_headers,
+                                                       expected_status_code=expected_status_code)
+            return rs_get_contacts
+        else:
+            logger.debug(f'Get contact by id={contact_id}')
+
+            rs_get_contact = self.request_utility.get(endpoint=f'contacts/{contact_id}',
+                                                      headers=auth_headers,
+                                                      expected_status_code=expected_status_code)
+            return rs_get_contact

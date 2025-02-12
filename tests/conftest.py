@@ -41,7 +41,7 @@ def auth_headers():
 
 
 @pytest.fixture()
-def cleanup_after_test(auth_headers, pytestconfig):
+def manage_contacts(auth_headers, pytestconfig):
     contacts_helper = ContactsHelper()
     created_contacts = []
 
@@ -55,5 +55,12 @@ def cleanup_after_test(auth_headers, pytestconfig):
 
     if pytestconfig.getoption('--rm'):
         for contact_id in created_contacts:
-            contacts_helper.delete_contact(auth_headers=auth_headers, contact_id=contact_id)
-            logging.debug(f'Delete contact: {contact_id}')
+            try:
+                contact = contacts_helper.get_contacts(auth_headers=auth_headers, contact_id=contact_id)
+                if contact:
+                    contacts_helper.delete_contact(auth_headers=auth_headers, contact_id=contact_id)
+                    logging.debug(f'Deleted contact: {contact_id}')
+            except AssertionError as e:
+                logging.debug(f'Contact {contact_id} already deleted or not found: {e}')
+            except Exception as e:
+                logging.error(f'Error while trying to delete contact {contact_id}: {e}')
