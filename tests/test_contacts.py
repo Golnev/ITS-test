@@ -7,7 +7,6 @@ from src.requests_utilities import RequestUtilities
 
 
 @pytest.mark.contacts
-@pytest.mark.check
 def test_add_contact(auth_headers, manage_contacts):
     logger.info("TEST: Add new contact")
 
