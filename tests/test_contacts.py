@@ -7,6 +7,7 @@ from src.requests_utilities import RequestUtilities
 
 
 @pytest.mark.contacts
+@pytest.mark.check
 def test_add_contact(auth_headers, manage_contacts):
     logger.info("TEST: Add new contact")
 
@@ -404,7 +405,6 @@ def test_upgrade_first_name_and_postal_code_together(
 @pytest.mark.contacts
 @pytest.mark.negative
 @pytest.mark.parametrize("phone", ["No Phone", 12345678901234567890])
-@pytest.mark.check
 def test_update_phone_with_wrong_data(auth_headers, manage_contacts, phone):
     logger.info("TEST: Update contact phone number with wrong data.")
 
